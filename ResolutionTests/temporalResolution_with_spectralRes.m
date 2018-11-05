@@ -12,8 +12,6 @@
 %---------------------------------------------------------------
 
 addpath('../')
-analysisDir = 'SIFT_tests';
-mkdir(analysisDir);
 
 %% Create figure for output
 close all
@@ -89,7 +87,6 @@ grid on
 plot(dLambdas*1e9,dt*1e12*ones(length(dLambdas)))
 xlabel('Spectral Resolution (nm)')
 ylabel('"Measured" Pulse Separation (ps)')
-print(fig1,[analysisDir filesep 'tempRes_v_specRes.png'],'-dpng')
 
 fig2 = figure
 errorbar(dLambdas/lambda0,t_meas*1e12,t_meas_err*1e12)
@@ -98,4 +95,3 @@ grid on
 plot(dLambdas/lambda0,dt*1e12*ones(length(dLambdas)))
 xlabel('Spectral Resolution (norm.)')
 ylabel('"Measured" Pulse Separation (ps)')
-print(fig2,[analysisDir filesep 'tempRes_v_specRes_norm.png'],'-dpng')
