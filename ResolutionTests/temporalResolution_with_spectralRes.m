@@ -12,11 +12,12 @@
 %---------------------------------------------------------------
 
 addpath('../')
+analysisDir = 'SIFT_tests';
+mkdir(analysisDir);
 
 %% Create figure for output
 close all
 clear all
-fig1 = figure;
 
 % Constants
 c = 2.9972e8;                   % The speed of light in vacuum
@@ -27,7 +28,7 @@ taue2   = tau/(sqrt(2*log(2))); % 1/e^2 pulse duration
 amp1    = 1;                    % Amplitude of pulse one
 amp2    = 1;                    % Amplitude of pulse two
 Nt0     = 2^20;                 % Number of points in initial time grid (make big)
-dt      = 10e-12;               % Separation between the pulses
+dt      = 5e-12;               % Separation between the pulses
 lambda  = 800e-9;               % fundamental wavelength of the pulse
 omega   = 2*pi*c/lambda;        % Convert to angular frequency
 
@@ -75,24 +76,26 @@ for i = 1:length(dLambdas)
     spec = interp1(2*pi*c./(xFreq),abs(FT).^2,lambda);
 
     % Now make a measurement of the pulse timing
-    [Delta_t,FWHM_timingPeak,t,IFT] = analyseSpectrum(lambda,spec,'fft',0);
+    [Delta_t,t_error,t,IFT] = analyseSpectrum(lambda,spec,'fft',0);
     t_meas(i) = Delta_t;
-    t_meas_err(i) = FWHM_timingPeak;
+    t_meas_err(i) = t_error;
 end
 
 % Plot the results!
-figure
+fig1 = figure
 errorbar(dLambdas*1e9,t_meas*1e12,t_meas_err*1e12)
 hold on
 grid on
 plot(dLambdas*1e9,dt*1e12*ones(length(dLambdas)))
 xlabel('Spectral Resolution (nm)')
 ylabel('"Measured" Pulse Separation (ps)')
+print(fig1,[analysisDir filesep 'tempRes_v_specRes.png'],'-dpng')
 
-figure
+fig2 = figure
 errorbar(dLambdas/lambda0,t_meas*1e12,t_meas_err*1e12)
 hold on
 grid on
 plot(dLambdas/lambda0,dt*1e12*ones(length(dLambdas)))
 xlabel('Spectral Resolution (norm.)')
 ylabel('"Measured" Pulse Separation (ps)')
+print(fig2,[analysisDir filesep 'tempRes_v_specRes_norm.png'],'-dpng')

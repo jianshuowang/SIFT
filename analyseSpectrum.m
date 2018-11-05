@@ -50,39 +50,47 @@ dt = 2*pi/tSampleFreq;
 t = [-dt*length(omega_uni)/2 : dt : dt*length(omega_uni)/2 - dt ];
 
 
-% Next step is to take an inverse Fourier transform of the resampled spectrum
-IFT = fftshift(ifft(ifftshift(spec_uni)));
+if method == 'fft'
+   % Next step is to take an inverse Fourier transform of the resampled spectrum
+   IFT = fftshift(ifft(ifftshift(spec_uni)));
  
 
-% Find the sideband peak, this corresponds to a first estimate of the 
-% temporal separation between the pulses
-[~,locs] = findpeaks(abs(IFT),t,'SortStr','descend');
+   % Find the sideband peak, this corresponds to a first estimate of the 
+   % temporal separation between the pulses
+   [~,locs] = findpeaks(abs(IFT),t,'SortStr','descend');
 
-% The timing peak will be the second largest peak (the largest peak in t>0)
-% You could alternatively use the negative peak, but you'd have to be clinically insane
-% To find the peak we simply loop through the peaks in descending order and look for
-% the first positive peak that isn't the largest peak in the time spectrum.
-cntr = 2;
-while locs(cntr) < 0
-    cntr = cntr+1;
+   % The timing peak will be the second largest peak (the largest peak in t>0)
+   % You could alternatively use the negative peak, but you'd have to be clinically insane
+   % To find the peak we simply loop through the peaks in descending order and look for
+   % the first positive peak that isn't the largest peak in the time spectrum.
+   cntr = 2;
+   while locs(cntr) < 0
+       cntr = cntr+1;
+   end
+
+   Delta_t_estimate = locs(cntr);
+
+   % Now that we have our estimate, reduce our spectrum to only positive values
+   [~,indx] = find(t>=0);
+   t = t(indx:end);
+   IFT = IFT(indx:end);
+
+   % Now hone in on the peak using a fitting method, where we fit two Gaussians to
+   % the positive side of the spectrum.
+   fitData = fitTimingSpectrum(t, IFT,Delta_t_estimate*1e12,debug);
+
+   % Now extract our measurements from the fit coefficients
+   FHWM_centralPeak = fitData(2)*sqrt(2*log(2));
+   % This gives an estimate of the measurement error
+   t_error  = fitData(3)*sqrt(2*log(2)); % FWHM_timing Peak.
+   Delta_t = fitData(4); 
+else 
+   disp("You've selected a method that Rob hasn't written yet...")
+   Delta_t = 0;
+   t_error = 0;
 end
 
-Delta_t_estimate = locs(cntr);
 
-% Now that we have our estimate, reduce our spectrum to only positive values
-[~,indx] = find(t>=0);
-t = t(indx:end);
-IFT = IFT(indx:end);
-
-% Now hone in on the peak using a fitting method, where we fit two Gaussians to
-% the positive side of the spectrum.
-fitData = fitTimingSpectrum(t, IFT,Delta_t_estimate*1e12,debug);
-
-% Now extract our measurements from the fit coefficients
-FHWM_centralPeak = fitData(2)*sqrt(2*log(2));
-% This gives an estimate of the measurement error
-FWHM_timingPeak  = fitData(3)*sqrt(2*log(2)); 
-Delta_t = fitData(4); 
 
 
 
