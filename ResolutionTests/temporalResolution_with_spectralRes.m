@@ -21,18 +21,18 @@ clear all
 c = 2.9972e8;                   % The speed of light in vacuum
 
 % Define the pulses and their separation
-tau     = 40e-15;               % pulse duration in femto second FWHMM pulse dur
+tau     = 45e-15;               % pulse duration in femto second FWHMM pulse dur
 taue2   = tau/(sqrt(2*log(2))); % 1/e^2 pulse duration
 amp1    = 1;                    % Amplitude of pulse one
 amp2    = 1;                    % Amplitude of pulse two
 Nt0     = 2^20;                 % Number of points in initial time grid (make big)
-dt      = 5e-12;               % Separation between the pulses
+dt      = 3e-12;               % Separation between the pulses
 lambda  = 800e-9;               % fundamental wavelength of the pulse
 omega   = 2*pi*c/lambda;        % Convert to angular frequency
 
 
 % Define Spectrometer Parameters
-dLambdas     = linspace(.0001e-9,.4e-9,200); % Spectral resolution of the spectrometer
+dLambdas     = linspace(.0001e-9,1e-9,200); % Spectral resolution of the spectrometer
 lambda0     = 800e-9;                        % Center wavelength of spectrometer
 requiredBandwidth = 60e-9;                   % Define the bandwidth required on the spectrometer
                                              % we will calculate the required number of pixels to achieve
